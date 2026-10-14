@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Machine</title>
+<meta name="description" content="Five superfluous instruments for the human shortcoming: nonchalance, apathy, Maslow, knowledge, and a machine that describes you while you read.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Archivo:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a machine hall — brass console up top, five halls on a tour route, an official verdict at the exit. Single dark look by choice. */
+:root{
+  --bg:#11131C; --panel:#191C28; --panel-2:#21253A; --line:#343952;
+  --bone:#ECE4D3; --muted:#A29E93; --brass:#C9A55A; --brass-hi:#EBCB86; --brass-lo:#7E6631;
+  --oxblood:#C4554B; --verdigris:#71B5A2;
+  --display:"Bodoni Moda","Didot","Bodoni 72",Georgia,serif;
+  --body:"Archivo",ui-sans-serif,system-ui,sans-serif;
+  --mono:"DM Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+.eyebrow{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap}
+.lang{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--brass-hi);text-decoration:none;border:1px solid var(--brass-lo);border-radius:999px;padding:3px 12px}
+.lang:hover{background:var(--panel-2)}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--bone);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:0 80px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--brass-hi);outline-offset:3px}
+p{margin:0}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.brass{color:var(--brass)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px 40px;align-items:center;padding-block:44px 28px;border-bottom:1px solid var(--line)}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(64px,13vw,168px);line-height:.84;letter-spacing:-.035em;margin:14px 0 0}
+.hero h1 em{font-style:italic;font-weight:400;color:var(--brass);letter-spacing:-.02em;display:block}
+.hero h1 small{display:block;font-family:var(--body);font-size:15px;font-weight:500;letter-spacing:0;color:var(--muted);margin-top:16px;line-height:1.4}
+.lede{font-size:19px;max-width:46ch;margin-top:22px;text-wrap:pretty}
+.lede b{font-weight:600;color:var(--brass-hi)}
+.lever-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:26px}
+.lever{border:1px solid var(--brass);background:linear-gradient(180deg,var(--brass-hi),var(--brass) 55%,var(--brass-lo));color:var(--bg);font-family:var(--display);font-weight:700;font-size:20px;padding:12px 26px;border-radius:999px;box-shadow:inset 0 1px 0 rgb(255 255 255 / .35),0 6px 20px rgb(0 0 0 / .4)}
+.lever:active{transform:translateY(1px)}
+#leverSay{font-style:italic;color:var(--muted);max-width:38ch}
+.gears{position:relative;aspect-ratio:1;max-width:420px;width:100%;justify-self:center}
+.gears svg{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+
+/* console */
+.console{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;padding-block:26px;border-bottom:1px solid var(--line)}
+.dial{display:grid;justify-items:center;gap:2px;text-align:center;min-width:0}
+.dial svg{width:100%;max-width:120px;height:auto}
+.dial .v{font-family:var(--display);font-weight:700;font-size:22px;font-variant-numeric:tabular-nums;margin-top:-34px;margin-bottom:12px}
+.dial .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dial.total .v{color:var(--brass-hi)}
+.console-cap{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 20px}
+
+/* halls */
+.hall{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:28px 48px;padding-block:64px;border-bottom:1px solid var(--line);scroll-margin-top:12px}
+.plaque{display:grid;gap:14px;align-content:start;min-width:0}
+.hallno{font-family:var(--display);font-style:italic;font-size:22px;color:var(--brass)}
+.hall h2{font-family:var(--display);font-weight:800;font-size:clamp(36px,5.4vw,60px);line-height:.95;letter-spacing:-.025em;margin:0;text-wrap:balance;overflow-wrap:anywhere}
+.hall h2 i{font-weight:400;color:var(--brass)}
+.sub{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.plaque p.body{max-width:46ch;color:var(--bone);text-wrap:pretty}
+.plaque p.body + p.body{margin-top:-2px}
+.apparatus{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:22px;display:grid;gap:16px;min-width:0;position:relative}
+.apparatus::before{content:"";position:absolute;inset:6px;border:1px solid var(--line);border-radius:3px;pointer-events:none;opacity:.55}
+.rivets{position:absolute;inset:0;pointer-events:none}
+.rivets i{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--brass-lo)}
+.rivets i:nth-child(1){top:12px;left:12px}.rivets i:nth-child(2){top:12px;right:12px}.rivets i:nth-child(3){bottom:12px;left:12px}.rivets i:nth-child(4){bottom:12px;right:12px}
+.say{font-family:var(--display);font-style:italic;font-size:21px;line-height:1.3;color:var(--bone);min-height:2.6em;text-wrap:balance}
+.stat{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+.aha{border-left:2px solid var(--verdigris);padding:4px 0 4px 16px;display:grid;gap:6px;max-width:52ch}
+.aha .mono{color:var(--verdigris)}
+.aha p{font-size:15.5px}
+@media (prefers-reduced-motion:no-preference){.aha.reveal{animation:rise .7s ease both}@keyframes rise{from{opacity:.0;transform:translateY(8px)}to{opacity:1;transform:none}}}
+
+.bigbtn{border:1px solid var(--brass);background:radial-gradient(circle at 50% 35%,var(--brass-hi),var(--brass) 55%,var(--brass-lo));color:var(--bg);font-family:var(--display);font-weight:800;font-size:clamp(22px,4vw,30px);border-radius:50%;width:min(210px,62vw);aspect-ratio:1;justify-self:center;box-shadow:inset 0 2px 0 rgb(255 255 255 / .4),inset 0 -8px 18px rgb(0 0 0 / .25),0 10px 30px rgb(0 0 0 / .45);padding:16px;line-height:1.05;text-wrap:balance}
+.bigbtn:active{transform:translateY(2px) scale(.985)}
+.meter{display:grid;gap:6px}
+.meter .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.meter .num{font-family:var(--display);font-weight:800;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.bar{height:10px;border-radius:5px;background:var(--panel-2);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--brass-lo),var(--brass-hi));width:0;transition:width .25s linear}
+
+/* apathy */
+.reservoir{display:grid;gap:6px}
+.care{display:grid;gap:8px}
+.care-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.care-row .nm{font-weight:500;overflow-wrap:anywhere}
+.care-row .bar{grid-column:1/2;height:6px}
+.care-row .bar i{background:linear-gradient(90deg,var(--oxblood),var(--brass))}
+.care-row button{grid-row:1/3;grid-column:2;border:1px solid var(--brass);background:none;color:var(--brass-hi);border-radius:999px;padding:6px 14px;font-size:14px;white-space:nowrap}
+.care-row button:hover{background:var(--panel-2)}
+.care-row.gone .nm{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--oxblood)}
+.care-row.gone button{border-color:var(--line);color:var(--muted)}
+.care-row .tag{font-family:var(--mono);font-size:11px;color:var(--oxblood);margin-left:8px;text-decoration:none;display:inline-block}
+
+/* maslow */
+.pyr{display:grid;gap:5px}
+.layer{display:grid;grid-template-columns:minmax(0,58%) minmax(0,1fr);gap:14px;align-items:center;background:none;border:0;padding:0;text-align:left;width:100%}
+.shape{height:48px;background:var(--panel-2);border:0;position:relative;transition:background .3s}
+.layer.full .shape{background:linear-gradient(180deg,var(--brass-hi),var(--brass))}
+.layer.paused .shape{background:linear-gradient(180deg,var(--brass-lo),var(--panel-2))}
+.layer .lbl{display:grid;gap:0;min-width:0}
+.layer .lbl b{font-weight:600;font-size:15px;line-height:1.2;overflow-wrap:anywhere}
+.layer .lbl span{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.layer.base .shape{height:30px;background:repeating-linear-gradient(135deg,var(--panel-2) 0 8px,var(--line) 8px 10px)}
+.layer:hover .shape{filter:brightness(1.15)}
+.layer.trans .shape{height:40px}
+.layer.trans.full .shape{background:linear-gradient(180deg,var(--bone),var(--verdigris))}
+@media (prefers-reduced-motion:no-preference){.shake{animation:shake .4s}@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}}
+
+/* knowledge */
+.island-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:center}
+.island{width:100%;max-width:360px;aspect-ratio:1;justify-self:center}
+.kstats{display:grid;gap:10px}
+.kstat{display:grid;gap:0}
+.kstat b{font-family:var(--display);font-weight:800;font-size:30px;font-variant-numeric:tabular-nums;line-height:1.05}
+.kstat span{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.fact{font-family:var(--display);font-size:20px;line-height:1.3;text-wrap:pretty}
+.newq{color:var(--verdigris);font-style:italic}
+.qlist{display:flex;flex-wrap:wrap;gap:6px}
+.qlist span{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.conf{display:grid;gap:4px}
+.conf svg{width:100%;height:auto;display:block}
+.btnrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:1px solid var(--brass);background:var(--panel-2);color:var(--brass-hi);border-radius:999px;padding:10px 20px;font-weight:600}
+.btn:hover{background:var(--line)}
+.btn.solid{background:var(--brass);color:var(--bg)}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* meta */
+.log{display:grid;gap:0;max-height:300px;overflow:auto;border-top:1px solid var(--line);font-size:14px}
+.log div{display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
+.log time{font-family:var(--mono);font-size:11.5px;color:var(--brass);font-variant-numeric:tabular-nums;padding-top:2px}
+.metastats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.built{font-family:var(--display);font-size:19px;line-height:1.3}
+.built small{display:block;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:4px}
+.nest{border:1px solid var(--brass-lo);padding:8px 8px 10px;border-radius:3px;font-family:var(--mono);font-size:11px;color:var(--muted);display:grid;gap:6px;min-width:0}
+.nest > span{overflow-wrap:anywhere}
+
+/* finale */
+.finale{padding-block:64px 24px;display:grid;gap:22px;justify-items:start}
+.finale h2{font-family:var(--display);font-weight:800;font-size:clamp(40px,7vw,84px);line-height:.92;letter-spacing:-.03em;margin:0}
+.finale h2 i{font-weight:400;color:var(--brass)}
+.letter{background:var(--bone);color:var(--bg);width:100%;max-width:760px;padding:clamp(20px,5vw,48px);border-radius:2px;display:grid;gap:14px;box-shadow:0 20px 50px rgb(0 0 0 / .5);font-size:15.5px}
+.letter .head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--brass-lo);padding-bottom:12px}
+.letter .inst{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.15}
+.letter .inst span{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:400;margin-top:4px;color:var(--brass-lo)}
+.letter dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 14px;margin:0;font-family:var(--mono);font-size:12px}
+.letter dt{color:var(--brass-lo)}
+.letter dd{margin:0}
+.letter p{max-width:62ch}
+.letter .verdict{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.2;font-style:italic}
+.letter .seal{justify-self:end;width:92px;height:92px}
+
+footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px 48px;padding-block:44px 0;border-top:1px solid var(--line);margin-top:40px;font-size:14px;color:var(--muted)}
+footer h3{font-family:var(--display);font-style:italic;font-weight:400;color:var(--brass);font-size:20px;margin:0 0 10px}
+footer ol{margin:0;padding-left:1.4em;display:grid;gap:6px}
+footer li::marker{font-family:var(--mono);color:var(--brass-lo)}
+
+@media (max-width:860px){
+  .hero,.hall,footer{grid-template-columns:minmax(0,1fr)}
+  .gears{max-width:300px;grid-row:1}
+  .console{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .island-wrap{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:420px){
+  .wrap{padding-inline:16px}
+  .metastats{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .layer{grid-template-columns:minmax(0,52%) minmax(0,1fr)}
+}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+<header class="hero">
+  <div>
+    <div class="eyebrow"><span class="mono">Royal Institute of Superfluous Instruments · Dept. of Human Shortcoming</span><a class="lang" href="https://mvanpassel-cmyk.github.io/de-machine/" hreflang="nl" lang="nl">Nederlands</a></div>
+    <h1>The <em>Machine</em><small>in five parts, one of which is you</small></h1>
+    <p class="lede">Five instruments for the things people try hardest at and are worst at: <b>not trying</b>, <b>not caring</b>, <b>needing</b>, <b>knowing</b> and <b>thinking about themselves</b>. They run on your attention. They are all connected. You will notice in due course.</p>
+    <div class="lever-row">
+      <button class="lever" id="lever">Switch on</button>
+      <span id="leverSay">The lever has been polished. Little else has been done to it.</span>
+    </div>
+  </div>
+  <div class="gears" aria-hidden="true"><svg id="gearSvg" viewBox="0 -20 440 480"></svg></div>
+</header>
+
+<section class="console" aria-label="Control panel">
+  <div class="console-cap"><span class="mono">Control panel · live</span><span class="mono" id="consoleCap">Efficiency is calculated as soon as you do something. Or don't.</span></div>
+</section>
+
+<section class="hall" id="z1">
+  <div class="plaque">
+    <div class="hallno">Hall I</div>
+    <h2>The Nonchalance Machine</h2>
+    <div class="sub">Designed 1528 · never used on purpose</div>
+    <p class="body">A button with one function: it does not work when you use it. Nonchalance rises only while you touch nothing. Scrolling and reading are allowed. Clicking, typing and wanting are not.</p>
+    <p class="body">The machine was built in the Netherlands and follows the national guideline: <i>doe maar gewoon, dan doe je al gek genoeg.</i> Just act normal; that's crazy enough already.</p>
+  </div>
+  <div class="apparatus">
+    <div class="rivets"><i></i><i></i><i></i><i></i></div>
+    <div class="meter">
+      <div class="row"><span class="mono">Nonchalance</span><span class="num" id="nNum">35</span></div>
+      <div class="bar"><i id="nBar"></i></div>
+      <div class="stat" id="nStat">The machine is waiting. Not for you. Just in general.</div>
+    </div>
+    <button class="bigbtn" id="nBtn">Try it</button>
+    <p class="say" id="nSay">Fine.</p>
+    <div class="aha" id="aha1" hidden>
+      <span class="mono">Aha · Hall I</span>
+      <p>In 1528 Baldassare Castiglione described <i>sprezzatura</i>: a certain nonchalance that conceals all art and makes everything look effortless. Courtiers spent years practising that effortlessness. You just reached it by doing nothing. That is the only route, and you cannot take it by trying.</p>
+    </div>
+  </div>
+</section>
+
+<section class="hall" id="z2">
+  <div class="plaque">
+    <div class="hallno">Hall II</div>
+    <h2>The Apathy Machine</h2>
+    <div class="sub">Runs only while you watch</div>
+    <p class="body">Seven concerns are slowly draining. You can care about them, but caring costs care units, and your reservoir refills more slowly than the concerns leak. It was calibrated that way on purpose. It is also calibrated that way in real life.</p>
+    <p class="body">Scroll away and everything stops. Look back and it leaks again.</p>
+  </div>
+  <div class="apparatus">
+    <div class="rivets"><i></i><i></i><i></i><i></i></div>
+    <div class="reservoir">
+      <div class="meter"><div class="row"><span class="mono">Care reservoir</span><span class="stat" id="resNum">100 cu</span></div><div class="bar"><i id="resBar"></i></div></div>
+    </div>
+    <div class="care" id="care"></div>
+    <p class="say" id="cSay">Choose what you care about. You cannot choose everything.</p>
+    <div class="aha" id="aha2" hidden>
+      <span class="mono">Aha · Hall II</span>
+      <p id="aha2a">To the Stoics, <i>apatheia</i> was a virtue: freedom from disturbing passions. Only later did it become a complaint. You just let something go, and the world kept turning.</p>
+      <p id="aha2b" hidden>Apathy is rarely a lack of feeling. It is a budget that does not balance. What you kept alive says more about you than what you let go.</p>
+    </div>
+  </div>
+</section>
+
+<section class="hall" id="z3">
+  <div class="plaque">
+    <div class="hallno">Hall III</div>
+    <h2>The <i>Maslow</i>'s Pyramid Machine</h2>
+    <div class="sub">Designed by someone else</div>
+    <p class="body">Fill your needs, from the bottom up. The machine is strict: skipping a layer is not allowed. Beneath the pyramid lies a foundation that was added later. Everyone recognises it.</p>
+    <p class="body">Self-actualisation waits at the top. What comes after is not in the drawing.</p>
+  </div>
+  <div class="apparatus">
+    <div class="rivets"><i></i><i></i><i></i><i></i></div>
+    <div class="pyr" id="pyr"></div>
+    <p class="say" id="mSay">Start at the bottom. Everyone starts at the bottom.</p>
+    <div class="aha" id="aha3" hidden>
+      <span class="mono">Aha · Hall III</span>
+      <p>Abraham Maslow never drew this pyramid. The shape appeared in 1960, in the work of management consultant Charles McDermid, and was copied everywhere after that. Maslow himself wrote that the order is not rigid. This machine refused you anyway. That is how the pyramid works in practice: stricter than its author.</p>
+      <p id="aha3b" hidden>Late in life Maslow described one more level above self-actualisation: self-transcendence, committing yourself to something larger than yourself. It never made it into the drawing.</p>
+    </div>
+  </div>
+</section>
+
+<section class="hall" id="z4">
+  <div class="plaque">
+    <div class="hallno">Hall IV</div>
+    <h2>The Knowledge Machine</h2>
+    <div class="sub">The more you know, the bigger it gets</div>
+    <p class="body">What you know is an island. Each time you learn something, the island grows, and so does the coast where the known meets the unknown. Every fact produces a new question. The conversation never ends. That is what it is for.</p>
+    <p class="body">Below, the machine tracks your confidence. You probably already know the shape of that line.</p>
+  </div>
+  <div class="apparatus">
+    <div class="rivets"><i></i><i></i><i></i><i></i></div>
+    <div class="island-wrap">
+      <svg class="island" id="island" viewBox="0 0 300 300" role="img" aria-label="The island of knowledge"></svg>
+      <div class="kstats">
+        <div class="kstat"><b id="kA">0</b><span>Area of what you know</span></div>
+        <div class="kstat"><b id="kP">0</b><span>Coastline of the unknown</span></div>
+        <div class="kstat"><b id="kN">0</b><span>Open questions</span></div>
+      </div>
+    </div>
+    <p class="fact" id="kFact">Nothing learned yet. The island is a rock with a flag.</p>
+    <p class="newq" id="kQ"></p>
+    <div class="btnrow"><button class="btn solid" id="kBtn">Learn something</button></div>
+    <div class="conf">
+      <div class="row" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span class="mono">Confidence</span><span class="stat" id="kConfLbl">No opinion yet</span></div>
+      <svg id="confSvg" viewBox="0 0 300 80" preserveAspectRatio="none" style="height:80px"></svg>
+    </div>
+    <div class="qlist" id="qlist"></div>
+    <div class="aha" id="aha4" hidden>
+      <span class="mono">Aha · Hall IV</span>
+      <p>The area of a circle grows with the square of its radius, the circumference only with the radius. But the coast is where the questions are, and it never runs out. Marcelo Gleiser called this the island of knowledge.</p>
+      <p id="aha4b" hidden>As for that line with the peak and the valley: it is not in Dunning and Kruger's 1999 study. It appeared later, on the internet. You recognised it anyway. That is knowledge too, just not the kind you thought you had.</p>
+    </div>
+  </div>
+</section>
+
+<section class="hall" id="z5">
+  <div class="plaque">
+    <div class="hallno">Hall V</div>
+    <h2>The Meta&shy;machine</h2>
+    <div class="sub">You are here · you were here all along</div>
+    <p class="body">This machine does nothing itself. It watches the other machines, and above all you, and writes down what it sees. You are now reading what it writes about how you read what it writes.</p>
+    <p class="body">It can also build machines. Even machines that build machines. There is a limit to that. The limit is not technical.</p>
+  </div>
+  <div class="apparatus">
+    <div class="rivets"><i></i><i></i><i></i><i></i></div>
+    <div class="metastats">
+      <div class="kstat"><b id="mSecs">0</b><span>Seconds in the building</span></div>
+      <div class="kstat"><b id="mActs">0</b><span>Actions</span></div>
+      <div class="kstat"><b id="mDescr">0</b><span>Times described</span></div>
+    </div>
+    <div class="log" id="log" aria-live="polite"></div>
+    <div class="btnrow">
+      <button class="btn" id="buildBtn">Build a machine</button>
+      <button class="btn" id="nestBtn">Build a machine that builds machines</button>
+    </div>
+    <div class="built" id="built">There are five machines. That is one more than necessary, but nobody knows which.</div>
+    <div id="nestBox"></div>
+  </div>
+</section>
+
+<section class="finale" id="z6">
+  <div class="mono">Exit · Department of Judgement</div>
+  <h2>The <i>Final Verdict</i></h2>
+  <p style="max-width:52ch;color:var(--muted)">The Machine weighs what you did in all five halls and draws up an official verdict. The verdict is irrevocable, until you click again.</p>
+  <button class="btn solid" id="judgeBtn">Let The Machine judge</button>
+  <article class="letter" id="letter" hidden></article>
+</section>
+
+<footer>
+  <div>
+    <h3>Instructions for use</h3>
+    <ol>
+      <li>The Machine accepts no liability for insights.</li>
+      <li>Insights acquired in Hall IV cannot be returned.</li>
+      <li>Whoever reads these instructions is already using The Machine.</li>
+      <li>Read article 5 first.</li>
+      <li>Do not read article 4.</li>
+      <li>There is no article 6.</li>
+      <li>See article 6.</li>
+    </ol>
+  </div>
+  <div>
+    <h3>Sources, for those who check</h3>
+    <ol>
+      <li>B. Castiglione, <i>Il Libro del Cortegiano</i> (1528), on <i>sprezzatura</i>.</li>
+      <li>Stoic <i>apatheia</i>: freedom from disturbing passions, not indifference.</li>
+      <li>T. Bridgman, S. Cummings &amp; J. Ballard, ‘Who built Maslow’s pyramid?’ (2019), on C. McDermid (1960).</li>
+      <li>A. Maslow, <i>The Farther Reaches of Human Nature</i> (1971), on self-transcendence.</li>
+      <li>J. Kruger &amp; D. Dunning, ‘Unskilled and unaware of it’ (1999).</li>
+      <li>M. Gleiser, <i>The Island of Knowledge</i> (2014).</li>
+    </ol>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+function h(tag,attrs={},...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(v==null||v===false)continue;if(k==="class")e.className=v;else if(k==="style")e.style.cssText=v;else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v===true?"":v)}for(const k of kids.flat()){if(k==null||k===false)continue;e.append(k.nodeType?k:document.createTextNode(String(k)))}return e}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+const T0=Date.now();
+const S={last:Date.now(),acts:0,actTimes:[],burst:0,
+  nonch:35,tries:0,nonchDone:false,idleLogged:false,
+  care:{res:100,visible:false,taps:0,dropped:[],items:[
+    {n:"The climate",v:78},{n:"Your inbox (2,847 unread)",v:52},{n:"World peace",v:66},{n:"The plant on the windowsill",v:44},
+    {n:"The dishes",v:58},{n:"A friend you haven't spoken to in months",v:71},{n:"Pandemic preparedness",v:62}]},
+  m:{filled:[false,false,false,false,false],trans:false,transFull:false,refusals:0,hunger:false,topAt:null},
+  k:{n:0,qs:[]},
+  meta:{log:[],descr:0,built:0,depth:0,visits:1,seen:{}}};
+
+let visits=1;try{visits=(+localStorage.getItem("dm-visits")||0)+1;localStorage.setItem("dm-visits",String(visits))}catch(e){}
+S.meta.visits=visits;
+
+/* ---------- meta log ---------- */
+function stamp(){const s=Math.floor((Date.now()-T0)/1000);return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function log(msg){S.meta.log.unshift({t:stamp(),msg});if(S.meta.log.length>60)S.meta.log.pop();S.meta.descr++;
+  $("log").replaceChildren(...S.meta.log.map(l=>h("div",{},h("time",{},l.t),h("span",{},l.msg))));}
+
+/* ---------- acting ---------- */
+function act(cost){S.last=Date.now();S.acts++;S.actTimes.push(performance.now());S.burst=Math.min(S.burst+1,8);
+  if(cost)S.nonch=Math.max(0,S.nonch-cost);S.idleLogged=false}
+document.addEventListener("pointerdown",()=>{S.last=Date.now();S.idleLogged=false},{passive:true});
+document.addEventListener("keydown",()=>{S.last=Date.now();S.idleLogged=false});
+
+/* ---------- gears ---------- */
+function gearPath(cx,cy,teeth,ro,ri){let d="";const step=Math.PI*2/teeth;
+  for(let i=0;i<teeth;i++){const a=i*step;const pts=[[ri,a],[ro,a+step*.18],[ro,a+step*.48],[ri,a+step*.66]];
+    pts.forEach(([r,an],j)=>{const x=(cx+r*Math.cos(an)).toFixed(2),y=(cy+r*Math.sin(an)).toFixed(2);d+=(i===0&&j===0?"M":"L")+x+" "+y})}
+  return d+"Z"}
+const gs=$("gearSvg");const NS="http://www.w3.org/2000/svg";
+function sv(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e}
+const G1=sv("g",{}),G2=sv("g",{}),G3=sv("g",{});
+G1.append(sv("path",{d:gearPath(0,0,24,150,132),fill:"#C9A55A"}),sv("circle",{r:"112",fill:"#11131C"}),sv("circle",{r:"100",fill:"none",stroke:"#7E6631","stroke-width":"2"}));
+for(let i=0;i<6;i++){G1.append(sv("rect",{x:"-7",y:"-100",width:"14",height:"80",fill:"#C9A55A",transform:`rotate(${i*60})`}))}
+G1.append(sv("circle",{r:"26",fill:"#C9A55A"}),sv("circle",{r:"9",fill:"#11131C"}));
+G2.append(sv("path",{d:gearPath(0,0,12,78,62),fill:"#71B5A2"}),sv("circle",{r:"46",fill:"#11131C"}),sv("circle",{r:"14",fill:"#71B5A2"}));
+G3.append(sv("path",{d:gearPath(0,0,9,58,45),fill:"#C4554B"}),sv("circle",{r:"30",fill:"#11131C"}),sv("circle",{r:"10",fill:"#C4554B"}));
+const gw=(g,x,y)=>{const w=sv("g",{transform:`translate(${x} ${y})`});w.append(g);gs.append(w);return g};
+gw(G1,170,200);gw(G2,346,72);gw(G3,130,395);
+const lbl=sv("text",{x:"170",y:"206","text-anchor":"middle","font-family":"Bodoni Moda, Georgia, serif","font-style":"italic","font-size":"15",fill:"#ECE4D3"});lbl.textContent="you";gs.append(lbl);
+let ang=0,lastF=performance.now();
+function frame(t){const dt=Math.min(.1,(t-lastF)/1000);lastF=t;
+  S.burst=Math.max(0,S.burst-dt*1.5);
+  const speed=reduce?0:(6+S.burst*22+S.nonch*.05);ang+=speed*dt;
+  G1.setAttribute("transform",`rotate(${ang.toFixed(2)})`);
+  G2.setAttribute("transform",`rotate(${(-ang*24/12+7).toFixed(2)})`);
+  G3.setAttribute("transform",`rotate(${(-ang*24/9+11).toFixed(2)})`);
+  requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+
+/* ---------- console dials ---------- */
+const DIALS=[["nonch","Nonchalance"],["zorg","Care"],["behoefte","Need"],["kennis","Knowledge"],["zelf","Self-awareness"],["total","Efficiency"]];
+const C=2*Math.PI*40,SW=C*.75;
+const dialEls={};
+const cons=document.querySelector(".console");
+DIALS.forEach(([k,n])=>{const svg=sv("svg",{viewBox:"0 0 100 100"});
+  svg.append(sv("circle",{cx:"50",cy:"50",r:"40",fill:"none",stroke:"#343952","stroke-width":"7","stroke-linecap":"round","stroke-dasharray":`${SW} ${C}`,transform:"rotate(135 50 50)"}));
+  const arc=sv("circle",{cx:"50",cy:"50",r:"40",fill:"none",stroke:k==="total"?"#EBCB86":"#C9A55A","stroke-width":"7","stroke-linecap":"round","stroke-dasharray":`0 ${C}`,transform:"rotate(135 50 50)"});
+  svg.append(arc);
+  for(let i=0;i<=10;i++){const a=(135+i*27)*Math.PI/180;svg.append(sv("line",{x1:(50+31*Math.cos(a)).toFixed(1),y1:(50+31*Math.sin(a)).toFixed(1),x2:(50+28*Math.cos(a)).toFixed(1),y2:(50+28*Math.sin(a)).toFixed(1),stroke:"#7E6631","stroke-width":"1"}))}
+  const v=h("div",{class:"v"},"0");
+  const d=h("div",{class:"dial"+(k==="total"?" total":"")},svg,v,h("div",{class:"n"},n));
+  cons.append(d);dialEls[k]={arc,v};});
+function vals(){
+  const items=S.care.items;const zorg=items.reduce((a,i)=>a+i.v,0)/items.length;
+  const lvl=S.m.filled.filter(Boolean).length+(S.m.transFull?1:0);
+  const beh=lvl/6*100;
+  const ken=clamp(S.k.n/12*100,0,100);
+  const zelf=clamp(S.meta.descr*3,0,100);
+  const tot=(S.nonch+zorg+beh+ken+zelf)/5;
+  return{nonch:S.nonch,zorg,behoefte:beh,kennis:ken,zelf,total:tot}}
+function renderDials(){const v=vals();for(const k in dialEls){const x=clamp(v[k],0,100);dialEls[k].arc.setAttribute("stroke-dasharray",`${(x/100*SW).toFixed(1)} ${C}`);dialEls[k].v.textContent=Math.round(x)}
+  const t=v.total;$("consoleCap").textContent=t<15?"Efficiency low. This is customary at the start.":t<35?"The Machine is warming up. So are you, presumably.":t<55?"Efficiency average. Exactly as expected, and therefore suspicious.":t<75?"Efficiency high. The Machine wonders what you are trying to prove.":"Efficiency exceptional. Someone is very good at things that do not exist."}
+
+/* ---------- lever ---------- */
+let leverN=0;
+$("lever").onclick=()=>{act(4);leverN++;S.burst=8;
+  const lines=["The Machine was already on. It was running on your expectation.","Still on. Switching on is mostly a feeling here.","You cannot switch The Machine on harder. You can switch it on more often.","This lever is not connected to anything. Look at the gears.","See? They turned faster. That was you, not the lever."];
+  $("leverSay").textContent=lines[Math.min(leverN-1,lines.length-1)];
+  if(leverN===1)log("The visitor switched The Machine on. The Machine was already on. Neither of them mentioned it.");
+  if(leverN===5)log("The visitor has pulled a lever connected to nothing five times. This has been filed under ‘faith’.")};
+
+/* ---------- I nonchalance ---------- */
+const SHRUGS=["Fine.","Whatever.","Sure.","If you like.","Huh.","Is that so.","These things happen.","Hm.","If you say so.","Fascinating. Not really.","Just act normal.","Oh well."];
+const NLABELS=["Try it","Try it less","Even less","Much less","Meh.","…","Never mind"];
+$("nBtn").onclick=()=>{S.tries++;act(15);
+  $("nBtn").textContent=NLABELS[Math.min(S.tries,NLABELS.length-1)];
+  $("nSay").textContent=pick(SHRUGS);
+  if(S.tries===1)log("The visitor pressed the button. That was exactly what was not intended, and therefore exactly what was intended.");
+  if(S.tries===7)log("Seven attempts at nonchalance. The Nonchalance Machine is moved, but does not show it.");
+  if(S.tries===20)log("Twenty times. The visitor wants very badly not to want.");
+  renderN()};
+function renderN(){$("nNum").textContent=Math.round(S.nonch);$("nBar").style.width=S.nonch+"%"}
+
+/* ---------- II apathy ---------- */
+function renderCare(){
+  const c=S.care;$("resNum").textContent=Math.floor(c.res)+" cu";$("resBar").style.width=c.res+"%";
+  const box=$("care");
+  if(!box.children.length){c.items.forEach((it,i)=>{const b=h("button",{id:"care"+i},"Care");
+      b.onclick=()=>tapCare(i);
+      box.append(h("div",{class:"care-row",id:"cr"+i},h("div",{class:"nm"},h("span",{},it.n),h("span",{class:"tag"})),b,h("div",{class:"bar"},h("i",{}))))})}
+  c.items.forEach((it,i)=>{const row=$("cr"+i);row.querySelector(".bar i").style.width=it.v+"%";
+    const gone=it.v<=0;row.classList.toggle("gone",gone);row.querySelector(".tag").textContent=gone?"let go":"";
+    $("care"+i).textContent=gone?"Care again":"Care"});
+}
+function tapCare(i){const c=S.care,it=c.items[i];act(6);
+  const cost=it.v<=0?30:15;
+  if(c.res<cost){$("cSay").textContent=pick(["Your care reservoir is empty. Try again later, when you feel something again.","There is no care left for now. That is not a character flaw, that is arithmetic.","Empty. Also known as Monday afternoon."]);return}
+  c.res-=cost;c.taps++;
+  if(it.v<=0){it.v=20;$("cSay").textContent=`You care about “${it.n}” again. It cost double. Coming back always costs more.`;log(`The visitor picked “${it.n}” up again. That is rare. The Machine notes it with a small pencil mark.`)}
+  else{it.v=Math.min(100,it.v+30);$("cSay").textContent=pick([`You care about “${it.n}”. For now.`,`“${it.n}” feels seen.`,"Well spent. Presumably.","Your concern has been registered and is being processed."]);
+    if(c.taps===1)log(`The visitor cared about “${it.n}”. Cost: 15 care units. Return: unknown.`)}
+  renderCare()}
+function careTick(){const c=S.care;if(!c.visible)return;
+  c.res=Math.min(100,c.res+.3);
+  c.items.forEach(it=>{if(it.v>0){it.v=Math.max(0,it.v-.15);if(it.v===0){c.dropped.push(it.n);dropped(it)}}});
+  renderCare()}
+function dropped(it){const c=S.care;
+  log(`The visitor let go of “${it.n}”. Nobody saw it, except this machine.`);
+  $("cSay").textContent=`“${it.n}” has been let go. It made no sound.`;
+  if(c.dropped.length===1){$("aha2").hidden=false;$("aha2").classList.add("reveal")}
+  if(c.dropped.length===3){$("aha2b").hidden=false;log("Three concerns let go. The Apathy Machine is now running at full scale.")}
+  if(c.dropped.length===7)log("All concerns have been let go. It is very quiet in Hall II. Too quiet.")}
+
+/* ---------- III maslow ---------- */
+const LAYERS=[["Physiological needs","food, sleep, warmth"],["Safety","a roof, a job, predictability"],["Belonging","love, friendship, the group chat"],["Esteem","recognition, status, likes"],["Self-actualisation","becoming who you are"]];
+const REFUSE=["The layer below first, please.","That is not how pyramids work.","Ambition is appreciated, not rewarded.","You cannot self-actualise without breakfast.","The pyramid is not amused.","Skipping is reserved for people with staff.","You are trying to belong without a roof. That is called a festival."];
+function trap(k,rows){const hb=50*(1-k/rows),ht=50*(1-(k+1)/rows);return `polygon(${(50-ht).toFixed(2)}% 0, ${(50+ht).toFixed(2)}% 0, ${(50+hb).toFixed(2)}% 100%, ${(50-hb).toFixed(2)}% 100%)`}
+function renderPyr(){
+  const p=$("pyr");p.replaceChildren();
+  if(S.m.trans){p.append(h("button",{class:"layer trans"+(S.m.transFull?" full":""),onclick:clickTrans},
+      h("div",{class:"shape",style:"clip-path:polygon(50% 0, 62% 50%, 50% 100%, 38% 50%)"}),
+      h("div",{class:"lbl"},h("b",{},"Self-transcendence"),h("span",{},"not in the drawing"))))}
+  for(let k=4;k>=0;k--){const full=S.m.filled[k];const paused=full&&S.m.hunger&&k>0;
+    p.append(h("button",{class:"layer"+(full?" full":"")+(paused?" paused":""),id:"lay"+k,onclick:()=>clickLayer(k),"aria-pressed":String(full)},
+      h("div",{class:"shape",style:`clip-path:${trap(k,5)}`}),
+      h("div",{class:"lbl"},h("b",{},LAYERS[k][0]),h("span",{},paused?"on hold":LAYERS[k][1]))))}
+  p.append(h("div",{class:"layer base full"},h("div",{class:"shape"}),h("div",{class:"lbl"},h("b",{},"Wi-Fi & battery"),h("span",{},"foundation, added later"))));
+}
+function clickLayer(k){act(6);const m=S.m;
+  if(m.filled[k]){$("mSay").textContent=k===0&&!m.hunger?"Already fulfilled. Or so you think.":"Already fulfilled. Filling is easier than feeling full.";return}
+  if(k>0&&!m.filled[k-1]){m.refusals++;$("mSay").textContent=REFUSE[(m.refusals-1)%REFUSE.length];
+    const el=$("lay"+k);el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake");
+    if(m.refusals===1)log("The visitor tried to skip a layer. The pyramid was not amused.");
+    if(m.refusals===3){showAha3();log("Three refusals. The pyramid is stricter than its author ever intended.")}
+    return}
+  m.filled[k]=true;
+  if(k===0&&m.hunger){m.hunger=false;$("mSay").textContent="You have eaten. The rest of the pyramid switches back on, as if nothing happened.";log("The visitor ate something. Self-actualisation has resumed.");renderPyr();return}
+  $("mSay").textContent=["Fed, slept. You function.","A roof. The rain is now someone else's problem.","You belong. A group chat has been created.","You are valued. There is a meeting invite.","You have become who you are. That felt shorter than expected."][k];
+  if(k===4){m.topAt=Math.round((Date.now()-T0)/1000);log(`The visitor reached self-actualisation in ${m.topAt} seconds. It took Maslow a lifetime.`);showAha3();
+    setTimeout(()=>{m.trans=true;renderPyr();$("mSay").textContent="Above the top, something appears that is not in the drawing.";$("aha3b").hidden=false},1600);
+    setTimeout(()=>{if(m.filled[0]){m.filled[0]=false;m.hunger=true;renderPyr();$("mSay").textContent="You are hungry again. The top is still there. Nobody is looking at it now.";log("The visitor got hungry again. The top remained, but nobody looked at it any more.")}},9000)}
+  renderPyr()}
+function clickTrans(){act(6);const m=S.m;
+  if(m.transFull){$("mSay").textContent="You are already beyond yourself. There is nobody left here to notice.";return}
+  m.transFull=true;$("mSay").textContent="You commit to something larger than yourself. Your pyramid suddenly looks small.";
+  log("The visitor transcended themselves. This machine is no longer sure whom it is describing.");renderPyr()}
+let aha3=false;function showAha3(){if(aha3)return;aha3=true;$("aha3").hidden=false;$("aha3").classList.add("reveal")}
+
+/* ---------- IV knowledge ---------- */
+const FACTS=[
+ ["Botanically, a banana is a berry. A strawberry is not.","So what is a berry, really?"],
+ ["Sharks have existed for longer than trees.","What did they swim past, before there were forests?"],
+ ["Cleopatra lived closer in time to the first Moon landing than to the building of the Great Pyramid of Giza.","Which antiquity are we living in now?"],
+ ["Your body hosts roughly as many bacterial cells as human cells.","Who, exactly, is reading this sentence?"],
+ ["Fleming discovered penicillin in 1928 because a culture dish went mouldy while he was on holiday.","How many discoveries are quietly going mouldy right now?"],
+ ["A day on Venus lasts longer than a year on Venus.","What is a day, when the Sun won't cooperate?"],
+ ["Wombats produce cube-shaped droppings.","Why are the corners so sharp?"],
+ ["There are more trees on Earth than stars in the Milky Way.","Who counted them, and how?"],
+ ["The University of Oxford is older than the Aztec Empire.","What do we actually mean by old?"],
+ ["An octopus has three hearts and blue blood.","So where does it keep its feelings?"],
+ ["The word robot comes from the Czech robota: forced labour, serfdom.","Who does this machine actually work for?"],
+ ["Socrates never wrote anything down. Everything he knew reaches us second-hand.","How much of what you know do you know yourself?"]];
+const CONF=[8,70,94,100,42,16,20,28,36,45,54,62,70];
+function confLabel(n){if(n===0)return"No opinion yet";if(n<=2)return"Rising, promising";if(n===3)return"Peak of Mount Stupid";if(n<=6)return"Valley of Despair";if(n<=9)return"Slope of Enlightenment";return"Plateau of Modesty"}
+function rOf(n){return Math.min(128,14+10*n)}
+function renderIsland(){
+  const svg=$("island");svg.replaceChildren();const n=S.k.n;const r=rOf(n);
+  const defs=sv("defs",{});const g=sv("radialGradient",{id:"fog"});g.append(sv("stop",{offset:"0","stop-color":"#21253A"}),sv("stop",{offset:"1","stop-color":"#11131C"}));defs.append(g);svg.append(defs);
+  svg.append(sv("rect",{x:"0",y:"0",width:"300",height:"300",fill:"url(#fog)"}));
+  for(let i=0;i<46;i++){const a=i*2.399,rr=60+((i*53)%95);const x=150+rr*Math.cos(a),y=150+rr*Math.sin(a);
+    if(Math.hypot(x-150,y-150)<r+10)continue;const t=sv("text",{x:x.toFixed(1),y:y.toFixed(1),"font-size":"10","text-anchor":"middle",fill:"#343952","font-family":"DM Mono, monospace"});t.textContent="?";svg.append(t)}
+  svg.append(sv("circle",{cx:"150",cy:"150",r:String(r+5),fill:"none",stroke:"#71B5A2","stroke-width":"1.5","stroke-dasharray":"3 4"}));
+  svg.append(sv("circle",{cx:"150",cy:"150",r:String(r),fill:"#C9A55A","fill-opacity":".85"}));
+  svg.append(sv("circle",{cx:"150",cy:"150",r:String(Math.max(4,r*.55)),fill:"#EBCB86","fill-opacity":".5"}));
+  S.k.qs.forEach((q,i)=>{const a=-Math.PI/2+i*2.399;const x=150+(r+16)*Math.cos(a),y=150+(r+16)*Math.sin(a);
+    svg.append(sv("circle",{cx:x.toFixed(1),cy:y.toFixed(1),r:"7",fill:"#11131C",stroke:"#71B5A2","stroke-width":"1.2"}));
+    const t=sv("text",{x:x.toFixed(1),y:(y+3.5).toFixed(1),"font-size":"10","text-anchor":"middle",fill:"#71B5A2","font-family":"DM Mono, monospace"});t.textContent="?";svg.append(t)});
+  svg.append(sv("line",{x1:"150",y1:"150",x2:"150",y2:String(150-r),stroke:"#11131C","stroke-width":"1.5"}));
+  svg.append(sv("path",{d:`M150 ${150-r} l12 4 l-12 4 z`,fill:"#C4554B"}));
+  $("kA").textContent=Math.round(Math.PI*r*r).toLocaleString("en-GB");
+  $("kP").textContent=Math.round(2*Math.PI*r).toLocaleString("en-GB");
+  $("kN").textContent=S.k.qs.length;
+  const cs=$("confSvg");cs.replaceChildren();
+  const pts=CONF.map((c,i)=>[i/(CONF.length-1)*290+5,75-c*.68]);
+  cs.append(sv("line",{x1:"5",y1:"75",x2:"295",y2:"75",stroke:"#343952","stroke-width":"1"}));
+  const upto=Math.min(n,CONF.length-1);
+  if(n>0){const shown=pts.slice(0,upto+1);
+    cs.append(sv("path",{d:"M"+shown.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L")+` L${shown[shown.length-1][0].toFixed(1)} 75 L5 75 Z`,fill:"#C9A55A","fill-opacity":".15"}));
+    cs.append(sv("path",{d:"M"+shown.map(p=>p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" L"),fill:"none",stroke:"#C9A55A","stroke-width":"2","vector-effect":"non-scaling-stroke"}));
+    const e=shown[shown.length-1];cs.append(sv("circle",{cx:e[0].toFixed(1),cy:e[1].toFixed(1),r:"3.5",fill:"#EBCB86"}))}
+  $("kConfLbl").textContent=confLabel(n);
+  $("qlist").replaceChildren(...S.k.qs.slice().reverse().map(q=>h("span",{},q)));
+}
+$("kBtn").onclick=()=>{act(6);const k=S.k;
+  if(k.n>=FACTS.length){k.n++;$("kFact").textContent=pick(["You learn something you already knew. It feels exactly the same.","The island is finished. The coast is not.","You repeat a fact. This is also known as an opinion.","There is nothing left to learn in this hall. That is the most dangerous thing a hall can say."]);$("kQ").textContent="";renderDials();return}
+  const [f,q]=FACTS[k.n];k.n++;k.qs.push(q);
+  $("kFact").textContent=f;$("kQ").textContent="New question: "+q;
+  if(k.n===1)log("The visitor learned something. The unknown grew along with it, as agreed.");
+  if(k.n===3)log("The visitor stands on the Peak of Mount Stupid. The view is magnificent. It is wrong.");
+  if(k.n===4){log("The visitor descends into the Valley of Despair. This is the first real sign of knowledge.");$("aha4").hidden=false;$("aha4").classList.add("reveal")}
+  if(k.n===6)$("aha4b").hidden=false;
+  if(k.n===5)log("The visitor now knows five facts and five new questions. The balance remains exactly zero. That is not a bug.");
+  if(k.n===FACTS.length)log("Every fact in this hall has been learned. Twelve questions now lie on the shore. Nobody is coming to collect them.");
+  if(k.n===FACTS.length)$("kBtn").textContent="Learn something else";
+  renderIsland()};
+
+/* ---------- V meta ---------- */
+const MA=["Procrastination","Regret","Meeting","Resolution","Sunday Evening","Inbox","Doubt","Nostalgia","Being-Right","Excuse","Minutes","Alignment","Small Change","Policy"];
+const MB=["good intentions","unread email","half-baked ideas","lost socks","parliamentary questions","the Sunday evening feeling","politeness","silence","old passwords","half-read books","last year's action items","the phrase ‘let's circle back’"];
+const MC=["tomorrow","an action item","another meeting","a vague sense of guilt","exactly the same thing, but later","a memo nobody reads","hot air","insight, occasionally","a new machine","a second meeting about the first meeting"];
+$("buildBtn").onclick=()=>{act(6);S.meta.built++;
+  const name=`The ${pick(MA)} Machine`;const r=(Math.random()*3).toFixed(1);
+  $("built").replaceChildren(h("span",{},`${name} turns ${pick(MB)} into ${pick(MC)}.`),h("small",{},`Efficiency ${r}% · machine no. ${5+S.meta.built} · nobody asked for it`));
+  if(S.meta.built===1)log(`The visitor built ${name}. There are now six machines. The five old ones look slightly jealous.`);
+  else if(S.meta.built%5===0)log(`The visitor has built ${S.meta.built} machines. This has become a factory. A factory is a machine.`)};
+$("nestBtn").onclick=()=>{act(6);const m=S.meta;m.depth=Math.min(m.depth+1,8);
+  let inner=null;for(let d=m.depth;d>=1;d--){const label=d===m.depth?"Machine":"Machine that builds the machine inside";
+    const box=h("div",{class:"nest",style:`border-color:${d%2?"#7E6631":"#71B5A2"}`},h("span",{},`${label} · level ${d}`));if(inner)box.append(inner);inner=box}
+  $("nestBox").replaceChildren(inner);
+  const lines={1:"The visitor built a machine that builds machines. This sentence is one of them.",3:"Three layers deep. Somewhere at the bottom the first machine is still running, unaware.",5:"Five layers. The Metamachine now describes a machine that describes a machine that builds a machine.",8:"Building further is pointless. Whoever builds the last machine is no longer a machine. That is you."};
+  if(lines[m.depth])log(lines[m.depth]);
+  if(m.depth===8){$("nestBtn").disabled=true;$("nestBtn").textContent="The builder has been reached"}};
+
+/* ---------- hall visits ---------- */
+const ENTER={z1:"The visitor enters Hall I. The Nonchalance Machine pretends not to notice.",z2:"The visitor enters Hall II. The concerns begin to leak, because someone is watching.",z3:"The visitor enters Hall III. The pyramid holds its breath.",z4:"The visitor enters Hall IV. The island is small, the sea is polite.",z5:"The visitor enters Hall V. Here it is described how the visitor reads that the visitor is being described.",z6:"The visitor approaches the Final Verdict. The Final Verdict approaches back."};
+if("IntersectionObserver" in window){
+  const io=new IntersectionObserver(es=>es.forEach(e=>{const id=e.target.id;
+    if(id==="z2")S.care.visible=e.isIntersecting;
+    if(e.isIntersecting&&!S.meta.seen[id]){S.meta.seen[id]=true;log(ENTER[id])}}),{threshold:.25});
+  ["z1","z2","z3","z4","z5","z6"].forEach(id=>io.observe($(id)));
+}else S.care.visible=true;
+
+/* ---------- finale ---------- */
+let judged=0;
+$("judgeBtn").onclick=()=>{act(4);judged++;const v=vals();const c=S.care;
+  const alive=c.items.filter(i=>i.v>0);const best=c.items.slice().sort((a,b)=>b.v-a.v)[0];
+  const nTxt=S.nonch>80?"olympically nonchalant":S.nonch>50?"composedly indifferent":S.nonch>20?"visibly searching":"intensely involved (our condolences)";
+  const lvl=S.m.transFull?"self-transcendence, a level that officially does not exist":S.m.filled.lastIndexOf(true)>=0?LAYERS[S.m.filled.lastIndexOf(true)][0].toLowerCase():"the foundation (Wi-Fi & battery)";
+  const secs=Math.round((Date.now()-T0)/1000);
+  const kenmerk="TM/"+new Date().getFullYear()+"/"+String(S.acts).padStart(4,"0")+"-"+judged;
+  const verdicts=["You were the machine all along. We were only the buttons.","The Machine watched you. You watched The Machine. It is a draw.","Nothing happened that you did not do yourself. That is the whole secret.","You came for five machines and left as the sixth."];
+  const letter=$("letter");letter.hidden=false;
+  letter.replaceChildren(
+    h("div",{class:"head"},h("div",{class:"inst"},"Royal Institute of Superfluous Instruments",h("span",{},"Department of Judgement · Directorate of Human Shortcoming")),
+      h("dl",{},h("dt",{},"Date"),h("dd",{},new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})),h("dt",{},"Subject"),h("dd",{},"Outcome of your visit"),h("dt",{},"Our ref."),h("dd",{},kenmerk))),
+    h("p",{},"Dear visitor,"),
+    h("p",{},`I hereby inform you of the outcome of your ${secs}-second visit to The Machine. The visit has been assessed on five components, in conjunction and with due regard for the human dimension.`),
+    h("p",{},`In Hall I you were found to be ${nTxt}, with a nonchalance of ${Math.round(S.nonch)} per cent${S.tries?`, after ${S.tries} attempts at being nonchalant`:", without making a single attempt, which in Hall I counts as the highest form of commitment"}.`),
+    h("p",{},`In Hall II you kept ${alive.length} of the seven concerns alive. You cared most about “${best.n}”.${c.dropped.length?` The first thing you let go was “${c.dropped[0]}”.`:" You let nothing go. That is usually because you did not watch for long enough."}`),
+    h("p",{},`In Hall III you reached ${lvl}${S.m.refusals?`, after being sent back ${S.m.refusals} times by a pyramid that had not read its own author`:""}.`),
+    h("p",{},`In Hall IV you learned ${Math.min(S.k.n,FACTS.length)} facts and collected ${S.k.qs.length} questions. Your coastline with the unknown measures ${Math.round(2*Math.PI*rOf(S.k.n))} units. That is ${S.k.n?"more than":"the same as"} when you came in, as it should be.`),
+    h("p",{},`The Metamachine described you ${S.meta.descr} times, on the basis of ${S.acts} actions.${S.meta.visits>1?` This is visit number ${S.meta.visits}. Until now The Machine pretended not to know.`:""}${judged>1?` This is verdict number ${judged}. The previous verdict changed because you looked at it.`:""}`),
+    h("p",{},`Total efficiency amounts to ${Math.round(v.total)} per cent. Higher efficiency would have been possible, but not desirable.`),
+    h("p",{class:"verdict"},verdicts[(judged-1)%verdicts.length]),
+    h("p",{},"Yours faithfully,"),
+    h("p",{},h("i",{},"The Machine"),h("br"),"p.p. the Metamachine"),
+    seal());
+  log(judged===1?"The visitor submitted to judgement. The verdict looked back.":`Verdict number ${judged}. The visitor wants a different answer. The Machine understands.`);
+  letter.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"})};
+function seal(){const s=sv("svg",{viewBox:"0 0 100 100",class:"seal"});
+  s.append(sv("path",{d:gearPath(50,50,16,47,41),fill:"#7E6631"}),sv("circle",{cx:"50",cy:"50",r:"36",fill:"none",stroke:"#11131C","stroke-width":"1"}));
+  const t=sv("text",{x:"50",y:"57","text-anchor":"middle","font-family":"Bodoni Moda, Georgia, serif","font-style":"italic","font-size":"22",fill:"#11131C"});t.textContent="TM";s.append(t);return s}
+
+/* ---------- main loop ---------- */
+setInterval(()=>{
+  const idle=Date.now()-S.last;
+  if(idle>2500){S.nonch=Math.min(100,S.nonch+1);$("nStat").textContent=S.nonch>=100?"Total nonchalance. Whatever you do, touch nothing.":"Nonchalance rising. You are doing well by doing nothing."}
+  else $("nStat").textContent="Effort detected. Nonchalance falling.";
+  if(S.nonch>=100&&!S.nonchDone){S.nonchDone=true;$("aha1").hidden=false;$("aha1").classList.add("reveal");$("nSay").textContent="See? It happened by itself.";
+    log("The visitor reached total nonchalance by doing nothing. The Nonchalance Machine is impressed, but does not let it show.")}
+  if(idle>60000&&!S.idleLogged){S.idleLogged=true;log("A whole minute passed with nothing happening. The Nonchalance Machine records this as its finest minute.")}
+  careTick();renderN();
+  $("mSecs").textContent=Math.round((Date.now()-T0)/1000);$("mActs").textContent=S.acts;$("mDescr").textContent=S.meta.descr;
+  renderDials();
+},250);
+
+/* ---------- boot ---------- */
+renderN();renderCare();renderPyr();renderIsland();
+log(S.meta.visits>1?`The visitor is here for visit number ${S.meta.visits}. The Machine pretends not to know.`:"A visitor has come in. The Machine pretends not to notice.");
+renderDials();
+})();
+</script>
+
+</body>
+</html>
