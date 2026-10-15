@@ -165,9 +165,25 @@ footer li::marker{font-family:var(--mono);color:var(--brass-lo)}
 
 @media (max-width:860px){
   .hero,.hall,footer{grid-template-columns:minmax(0,1fr)}
-  .gears{max-width:300px;grid-row:1}
   .console{grid-template-columns:repeat(3,minmax(0,1fr))}
   .island-wrap{grid-template-columns:minmax(0,1fr)}
+}
+button,.lang{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.sound{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:10;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--brass);background:rgb(17 19 28 / .86);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:var(--brass-hi);border-radius:999px;padding:10px 16px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 6px 20px rgb(0 0 0 / .45)}
+.sound svg{width:18px;height:18px;flex:none}
+.sound .waves{opacity:.25;transition:opacity .2s}
+.sound[aria-pressed="true"]{background:var(--brass);color:var(--bg)}
+.sound[aria-pressed="true"] .waves{opacity:1}
+@media (max-width:860px){
+  .hero{position:relative;overflow-x:clip;padding-block:22px 22px}
+  .hero > div:first-child{position:relative;z-index:1}
+  .hero .eyebrow{max-width:62%}
+  .gears{position:absolute;top:0;right:-6px;width:min(44vw,250px);max-width:none;z-index:0;pointer-events:none}
+  .lede{font-size:17px}
+  .hall{padding-block:44px;gap:20px}
+  .apparatus{padding:18px 16px}
+  .island{max-width:260px}
+  .say{font-size:19px}
 }
 @media (max-width:420px){
   .wrap{padding-inline:16px}
@@ -332,6 +348,8 @@ footer li::marker{font-family:var(--mono);color:var(--brass-lo)}
   <article class="letter" id="letter" hidden></article>
 </section>
 
+<button class="sound" id="snd" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="waves" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg><span id="sndLbl">Sound: off</span></button>
+
 <footer>
   <div>
     <h3>Instructions for use</h3>
@@ -380,15 +398,54 @@ const S={last:Date.now(),acts:0,actTimes:[],burst:0,
 let visits=1;try{visits=(+localStorage.getItem("dm-visits")||0)+1;localStorage.setItem("dm-visits",String(visits))}catch(e){}
 S.meta.visits=visits;
 
+/* ---------- sound (synthesised, off by default) ---------- */
+const SND={on:false,ctx:null,
+  init(){if(this.ctx)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
+    const c=this.ctx=new AC();this.master=c.createGain();this.master.gain.value=0;this.master.connect(c.destination);
+    const len=c.sampleRate;const b=c.createBuffer(1,len,c.sampleRate);const d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;this.buf=b;
+    const g=c.createGain();g.gain.value=.05;const lp=c.createBiquadFilter();lp.type="lowpass";lp.frequency.value=170;this.lp=lp;
+    [55,55.35,110.2].forEach((f,i)=>{const o=c.createOscillator();o.type=i<2?"sawtooth":"sine";o.frequency.value=f;o.connect(lp);o.start()});
+    const lfo=c.createOscillator();lfo.frequency.value=.11;const lg=c.createGain();lg.gain.value=.018;lfo.connect(lg);lg.connect(g.gain);lfo.start();
+    lp.connect(g);g.connect(this.master)},
+  set(on){this.on=on;if(on){this.init();if(!this.ctx)return;this.ctx.resume();this.master.gain.setTargetAtTime(.6,this.ctx.currentTime,.25)}
+    else if(this.ctx)this.master.gain.setTargetAtTime(0,this.ctx.currentTime,.12)},
+  ok(){return this.on&&this.ctx&&this.ctx.state==="running"},
+  tone(f,dur=.3,type="sine",vol=.2,when=0,glide){if(!this.ok())return;const c=this.ctx,t=c.currentTime+when;const o=c.createOscillator(),g=c.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t);if(glide)o.frequency.exponentialRampToValueAtTime(glide,t+dur);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(this.master);o.start(t);o.stop(t+dur+.05)},
+  noise(dur=.08,freq=2000,q=1,vol=.2,type="bandpass",when=0,sweep){if(!this.ok())return;const c=this.ctx,t=c.currentTime+when;const s=c.createBufferSource();s.buffer=this.buf;
+    const f=c.createBiquadFilter();f.type=type;f.frequency.setValueAtTime(freq,t);if(sweep)f.frequency.exponentialRampToValueAtTime(sweep,t+dur);f.Q.value=q;
+    const g=c.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(this.master);s.start(t,Math.random()*.5);s.stop(t+dur+.02)},
+  tick(){this.noise(.028,3000+Math.random()*900,7,.1)},
+  clunk(){this.tone(95,.2,"sine",.38,0,42);this.noise(.06,900,1.2,.22)},
+  lever(){this.clunk();this.noise(.7,260,.7,.2,"bandpass",.05,2600);this.tone(58,.6,"triangle",.22,.12,124)},
+  pfff(){this.noise(.6,1500,.8,.24,"bandpass",0,450)},
+  ping(f=880){this.tone(f,.7,"sine",.17);this.tone(f*2.01,.4,"sine",.05)},
+  drop(){this.tone(720,.7,"sine",.15,0,170);this.noise(.15,400,2,.08,"bandpass",.5)},
+  buzz(){this.tone(110,.3,"square",.08);this.tone(117,.3,"square",.06)},
+  rise(k){const f=[262,294,330,392,440,523][k]||523;this.tone(f,.55,"triangle",.17);this.tone(f*1.5,.5,"sine",.06,.07)},
+  growl(){this.noise(1.2,160,5,.4,"lowpass",0,55);this.tone(68,1,"sawtooth",.05,0,48)},
+  chime(n){const f=392*Math.pow(2,(n%14)/12);this.tone(f,1.2,"sine",.14);this.tone(f*1.5,1,"sine",.06,.08);this.tone(f*2,.8,"sine",.04,.16)},
+  aha(){[523,659,784,1047].forEach((f,i)=>this.tone(f,1.5,"sine",.09,i*.09))},
+  type(){this.noise(.022,2600,3,.06)},
+  stamp(){this.tone(52,.4,"sine",.55,0,34);this.noise(.14,480,.8,.35,"lowpass");this.ping(1318)},
+  build(){[0,.08,.16].forEach(w=>this.noise(.05,1800,5,.13,"bandpass",w));this.tone(200,.28,"square",.05,.22,420)}};
+const SNDLBL=["Sound: off","Sound: on"];
+$("snd").onclick=()=>{SND.set(!SND.on);$("snd").setAttribute("aria-pressed",String(SND.on));$("sndLbl").textContent=SNDLBL[SND.on?1:0];
+  if(SND.on){SND.lever();log("The visitor switched the sound on. The Machine now sounds the way it always felt.")}
+  else log("Sound off. The Machine keeps humming, but only in its head.")};
+document.addEventListener("visibilitychange",()=>{if(!SND.ctx)return;if(document.hidden)SND.ctx.suspend();else if(SND.on)SND.ctx.resume()});
+
 /* ---------- meta log ---------- */
 function stamp(){const s=Math.floor((Date.now()-T0)/1000);return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
-function log(msg){S.meta.log.unshift({t:stamp(),msg});if(S.meta.log.length>60)S.meta.log.pop();S.meta.descr++;
+function log(msg){S.meta.log.unshift({t:stamp(),msg});if(S.meta.log.length>60)S.meta.log.pop();S.meta.descr++;SND.type();
   $("log").replaceChildren(...S.meta.log.map(l=>h("div",{},h("time",{},l.t),h("span",{},l.msg))));}
 
 /* ---------- acting ---------- */
 function act(cost){S.last=Date.now();S.acts++;S.actTimes.push(performance.now());S.burst=Math.min(S.burst+1,8);
   if(cost)S.nonch=Math.max(0,S.nonch-cost);S.idleLogged=false}
-document.addEventListener("pointerdown",()=>{S.last=Date.now();S.idleLogged=false},{passive:true});
+document.addEventListener("click",()=>{S.last=Date.now();S.idleLogged=false});
 document.addEventListener("keydown",()=>{S.last=Date.now();S.idleLogged=false});
 
 /* ---------- gears ---------- */
@@ -407,13 +464,15 @@ G3.append(sv("path",{d:gearPath(0,0,9,58,45),fill:"#C4554B"}),sv("circle",{r:"30
 const gw=(g,x,y)=>{const w=sv("g",{transform:`translate(${x} ${y})`});w.append(g);gs.append(w);return g};
 gw(G1,170,200);gw(G2,346,72);gw(G3,130,395);
 const lbl=sv("text",{x:"170",y:"206","text-anchor":"middle","font-family":"Bodoni Moda, Georgia, serif","font-style":"italic","font-size":"15",fill:"#ECE4D3"});lbl.textContent="you";gs.append(lbl);
-let ang=0,lastF=performance.now();
+let ang=0,lastF=performance.now(),lastTooth=0;
 function frame(t){const dt=Math.min(.1,(t-lastF)/1000);lastF=t;
   S.burst=Math.max(0,S.burst-dt*1.5);
   const speed=reduce?0:(6+S.burst*22+S.nonch*.05);ang+=speed*dt;
   G1.setAttribute("transform",`rotate(${ang.toFixed(2)})`);
   G2.setAttribute("transform",`rotate(${(-ang*24/12+7).toFixed(2)})`);
   G3.setAttribute("transform",`rotate(${(-ang*24/9+11).toFixed(2)})`);
+  const tooth=Math.floor(ang/15);if(tooth!==lastTooth){lastTooth=tooth;SND.tick()}
+  if(SND.ok())SND.lp.frequency.setTargetAtTime(160+S.burst*70,SND.ctx.currentTime,.2);
   requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 
@@ -443,7 +502,7 @@ function renderDials(){const v=vals();for(const k in dialEls){const x=clamp(v[k]
 
 /* ---------- lever ---------- */
 let leverN=0;
-$("lever").onclick=()=>{act(4);leverN++;S.burst=8;
+$("lever").onclick=()=>{act(4);leverN++;S.burst=8;SND.lever();
   const lines=["The Machine was already on. It was running on your expectation.","Still on. Switching on is mostly a feeling here.","You cannot switch The Machine on harder. You can switch it on more often.","This lever is not connected to anything. Look at the gears.","See? They turned faster. That was you, not the lever."];
   $("leverSay").textContent=lines[Math.min(leverN-1,lines.length-1)];
   if(leverN===1)log("The visitor switched The Machine on. The Machine was already on. Neither of them mentioned it.");
@@ -452,7 +511,7 @@ $("lever").onclick=()=>{act(4);leverN++;S.burst=8;
 /* ---------- I nonchalance ---------- */
 const SHRUGS=["Fine.","Whatever.","Sure.","If you like.","Huh.","Is that so.","These things happen.","Hm.","If you say so.","Fascinating. Not really.","Just act normal.","Oh well."];
 const NLABELS=["Try it","Try it less","Even less","Much less","Meh.","…","Never mind"];
-$("nBtn").onclick=()=>{S.tries++;act(15);
+$("nBtn").onclick=()=>{S.tries++;act(15);SND.pfff();
   $("nBtn").textContent=NLABELS[Math.min(S.tries,NLABELS.length-1)];
   $("nSay").textContent=pick(SHRUGS);
   if(S.tries===1)log("The visitor pressed the button. That was exactly what was not intended, and therefore exactly what was intended.");
@@ -474,8 +533,8 @@ function renderCare(){
 }
 function tapCare(i){const c=S.care,it=c.items[i];act(6);
   const cost=it.v<=0?30:15;
-  if(c.res<cost){$("cSay").textContent=pick(["Your care reservoir is empty. Try again later, when you feel something again.","There is no care left for now. That is not a character flaw, that is arithmetic.","Empty. Also known as Monday afternoon."]);return}
-  c.res-=cost;c.taps++;
+  if(c.res<cost){SND.buzz();$("cSay").textContent=pick(["Your care reservoir is empty. Try again later, when you feel something again.","There is no care left for now. That is not a character flaw, that is arithmetic.","Empty. Also known as Monday afternoon."]);return}
+  c.res-=cost;c.taps++;SND.ping(it.v<=0?440:620+i*55);
   if(it.v<=0){it.v=20;$("cSay").textContent=`You care about “${it.n}” again. It cost double. Coming back always costs more.`;log(`The visitor picked “${it.n}” up again. That is rare. The Machine notes it with a small pencil mark.`)}
   else{it.v=Math.min(100,it.v+30);$("cSay").textContent=pick([`You care about “${it.n}”. For now.`,`“${it.n}” feels seen.`,"Well spent. Presumably.","Your concern has been registered and is being processed."]);
     if(c.taps===1)log(`The visitor cared about “${it.n}”. Cost: 15 care units. Return: unknown.`)}
@@ -484,7 +543,7 @@ function careTick(){const c=S.care;if(!c.visible)return;
   c.res=Math.min(100,c.res+.3);
   c.items.forEach(it=>{if(it.v>0){it.v=Math.max(0,it.v-.15);if(it.v===0){c.dropped.push(it.n);dropped(it)}}});
   renderCare()}
-function dropped(it){const c=S.care;
+function dropped(it){const c=S.care;SND.drop();
   log(`The visitor let go of “${it.n}”. Nobody saw it, except this machine.`);
   $("cSay").textContent=`“${it.n}” has been let go. It made no sound.`;
   if(c.dropped.length===1){$("aha2").hidden=false;$("aha2").classList.add("reveal")}
@@ -508,21 +567,21 @@ function renderPyr(){
 }
 function clickLayer(k){act(6);const m=S.m;
   if(m.filled[k]){$("mSay").textContent=k===0&&!m.hunger?"Already fulfilled. Or so you think.":"Already fulfilled. Filling is easier than feeling full.";return}
-  if(k>0&&!m.filled[k-1]){m.refusals++;$("mSay").textContent=REFUSE[(m.refusals-1)%REFUSE.length];
+  if(k>0&&!m.filled[k-1]){m.refusals++;SND.buzz();$("mSay").textContent=REFUSE[(m.refusals-1)%REFUSE.length];
     const el=$("lay"+k);el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake");
     if(m.refusals===1)log("The visitor tried to skip a layer. The pyramid was not amused.");
     if(m.refusals===3){showAha3();log("Three refusals. The pyramid is stricter than its author ever intended.")}
     return}
-  m.filled[k]=true;
+  m.filled[k]=true;SND.rise(k);
   if(k===0&&m.hunger){m.hunger=false;$("mSay").textContent="You have eaten. The rest of the pyramid switches back on, as if nothing happened.";log("The visitor ate something. Self-actualisation has resumed.");renderPyr();return}
   $("mSay").textContent=["Fed, slept. You function.","A roof. The rain is now someone else's problem.","You belong. A group chat has been created.","You are valued. There is a meeting invite.","You have become who you are. That felt shorter than expected."][k];
   if(k===4){m.topAt=Math.round((Date.now()-T0)/1000);log(`The visitor reached self-actualisation in ${m.topAt} seconds. It took Maslow a lifetime.`);showAha3();
-    setTimeout(()=>{m.trans=true;renderPyr();$("mSay").textContent="Above the top, something appears that is not in the drawing.";$("aha3b").hidden=false},1600);
-    setTimeout(()=>{if(m.filled[0]){m.filled[0]=false;m.hunger=true;renderPyr();$("mSay").textContent="You are hungry again. The top is still there. Nobody is looking at it now.";log("The visitor got hungry again. The top remained, but nobody looked at it any more.")}},9000)}
+    setTimeout(()=>{m.trans=true;SND.aha();renderPyr();$("mSay").textContent="Above the top, something appears that is not in the drawing.";$("aha3b").hidden=false},1600);
+    setTimeout(()=>{if(m.filled[0]){m.filled[0]=false;m.hunger=true;SND.growl();renderPyr();$("mSay").textContent="You are hungry again. The top is still there. Nobody is looking at it now.";log("The visitor got hungry again. The top remained, but nobody looked at it any more.")}},9000)}
   renderPyr()}
 function clickTrans(){act(6);const m=S.m;
   if(m.transFull){$("mSay").textContent="You are already beyond yourself. There is nobody left here to notice.";return}
-  m.transFull=true;$("mSay").textContent="You commit to something larger than yourself. Your pyramid suddenly looks small.";
+  m.transFull=true;SND.aha();$("mSay").textContent="You commit to something larger than yourself. Your pyramid suddenly looks small.";
   log("The visitor transcended themselves. This machine is no longer sure whom it is describing.");renderPyr()}
 let aha3=false;function showAha3(){if(aha3)return;aha3=true;$("aha3").hidden=false;$("aha3").classList.add("reveal")}
 
@@ -573,7 +632,7 @@ function renderIsland(){
 }
 $("kBtn").onclick=()=>{act(6);const k=S.k;
   if(k.n>=FACTS.length){k.n++;$("kFact").textContent=pick(["You learn something you already knew. It feels exactly the same.","The island is finished. The coast is not.","You repeat a fact. This is also known as an opinion.","There is nothing left to learn in this hall. That is the most dangerous thing a hall can say."]);$("kQ").textContent="";renderDials();return}
-  const [f,q]=FACTS[k.n];k.n++;k.qs.push(q);
+  const [f,q]=FACTS[k.n];k.n++;k.qs.push(q);SND.chime(k.n);
   $("kFact").textContent=f;$("kQ").textContent="New question: "+q;
   if(k.n===1)log("The visitor learned something. The unknown grew along with it, as agreed.");
   if(k.n===3)log("The visitor stands on the Peak of Mount Stupid. The view is magnificent. It is wrong.");
@@ -588,12 +647,12 @@ $("kBtn").onclick=()=>{act(6);const k=S.k;
 const MA=["Procrastination","Regret","Meeting","Resolution","Sunday Evening","Inbox","Doubt","Nostalgia","Being-Right","Excuse","Minutes","Alignment","Small Change","Policy"];
 const MB=["good intentions","unread email","half-baked ideas","lost socks","parliamentary questions","the Sunday evening feeling","politeness","silence","old passwords","half-read books","last year's action items","the phrase ‘let's circle back’"];
 const MC=["tomorrow","an action item","another meeting","a vague sense of guilt","exactly the same thing, but later","a memo nobody reads","hot air","insight, occasionally","a new machine","a second meeting about the first meeting"];
-$("buildBtn").onclick=()=>{act(6);S.meta.built++;
+$("buildBtn").onclick=()=>{act(6);S.meta.built++;SND.build();
   const name=`The ${pick(MA)} Machine`;const r=(Math.random()*3).toFixed(1);
   $("built").replaceChildren(h("span",{},`${name} turns ${pick(MB)} into ${pick(MC)}.`),h("small",{},`Efficiency ${r}% · machine no. ${5+S.meta.built} · nobody asked for it`));
   if(S.meta.built===1)log(`The visitor built ${name}. There are now six machines. The five old ones look slightly jealous.`);
   else if(S.meta.built%5===0)log(`The visitor has built ${S.meta.built} machines. This has become a factory. A factory is a machine.`)};
-$("nestBtn").onclick=()=>{act(6);const m=S.meta;m.depth=Math.min(m.depth+1,8);
+$("nestBtn").onclick=()=>{act(6);SND.clunk();const m=S.meta;m.depth=Math.min(m.depth+1,8);
   let inner=null;for(let d=m.depth;d>=1;d--){const label=d===m.depth?"Machine":"Machine that builds the machine inside";
     const box=h("div",{class:"nest",style:`border-color:${d%2?"#7E6631":"#71B5A2"}`},h("span",{},`${label} · level ${d}`));if(inner)box.append(inner);inner=box}
   $("nestBox").replaceChildren(inner);
@@ -612,7 +671,7 @@ if("IntersectionObserver" in window){
 
 /* ---------- finale ---------- */
 let judged=0;
-$("judgeBtn").onclick=()=>{act(4);judged++;const v=vals();const c=S.care;
+$("judgeBtn").onclick=()=>{act(4);judged++;SND.stamp();const v=vals();const c=S.care;
   const alive=c.items.filter(i=>i.v>0);const best=c.items.slice().sort((a,b)=>b.v-a.v)[0];
   const nTxt=S.nonch>80?"olympically nonchalant":S.nonch>50?"composedly indifferent":S.nonch>20?"visibly searching":"intensely involved (our condolences)";
   const lvl=S.m.transFull?"self-transcendence, a level that officially does not exist":S.m.filled.lastIndexOf(true)>=0?LAYERS[S.m.filled.lastIndexOf(true)][0].toLowerCase():"the foundation (Wi-Fi & battery)";
@@ -646,7 +705,7 @@ setInterval(()=>{
   const idle=Date.now()-S.last;
   if(idle>2500){S.nonch=Math.min(100,S.nonch+1);$("nStat").textContent=S.nonch>=100?"Total nonchalance. Whatever you do, touch nothing.":"Nonchalance rising. You are doing well by doing nothing."}
   else $("nStat").textContent="Effort detected. Nonchalance falling.";
-  if(S.nonch>=100&&!S.nonchDone){S.nonchDone=true;$("aha1").hidden=false;$("aha1").classList.add("reveal");$("nSay").textContent="See? It happened by itself.";
+  if(S.nonch>=100&&!S.nonchDone){S.nonchDone=true;SND.aha();$("aha1").hidden=false;$("aha1").classList.add("reveal");$("nSay").textContent="See? It happened by itself.";
     log("The visitor reached total nonchalance by doing nothing. The Nonchalance Machine is impressed, but does not let it show.")}
   if(idle>60000&&!S.idleLogged){S.idleLogged=true;log("A whole minute passed with nothing happening. The Nonchalance Machine records this as its finest minute.")}
   careTick();renderN();
